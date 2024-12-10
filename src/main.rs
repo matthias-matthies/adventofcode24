@@ -1,5 +1,6 @@
 use std::collections::{BinaryHeap, HashMap};
 use std::fs;
+use regex::Regex;
 
 fn main_01_1() {
     // Get assets/01.txt
@@ -315,9 +316,70 @@ fn main_02_2() {
 }
 
 fn main_03_1() {
+    // Get assets/03.txt
+    // regex for collecting fitting muls
+    // add together
+    let file_contents = fs::read_to_string("assets/03.txt")
+        .expect("File to be read");
 
+    let re = Regex::new(r"mul\((\d+),(\d+)\)").unwrap();
+
+    let results: Vec<(i32)> = re.captures_iter(&*file_contents).map(|caps| {
+        let (_, [left, right]) = caps.extract();
+        (left.parse::<i32>().unwrap() * right.parse::<i32>().unwrap())
+    }).collect();
+
+    let mut sum = 0;
+    for val in results {
+        sum += val;
+    }
+
+    println!("Summe: {sum}");
 }
-fn main_03_2() {}
+fn main_03_2() {
+    // Get assets/03.txt
+    // regex for collecting fitting muls
+    // add together
+    let file_contents = fs::read_to_string("assets/03.txt")
+        .expect("File to be read");
+
+    // Regex patterns for mul and control instructions
+    let mul_pattern = Regex::new(r"mul\(\d+,\d+\)").unwrap();
+    let control_pattern = Regex::new(r"do\(\)|don't\(\)").unwrap();
+
+    let mut enabled = true; // Start with mul enabled
+    let mut captures = Vec::new(); // Store captured mul instructions
+
+    // Combine both regex patterns into one for sequential parsing
+    let combined_pattern = Regex::new(r"mul\(\d+,\d+\)|do\(\)|don't\(\)")
+        .unwrap();
+
+    for caps in combined_pattern.find_iter(&*file_contents) {
+        let token = caps.as_str();
+        if control_pattern.is_match(token) {
+            // Update the enabled state based on control instructions
+            if token == "do()" {
+                enabled = true;
+            } else if token == "don't()" {
+                enabled = false;
+            }
+        } else if enabled && mul_pattern.is_match(token) {
+            // Capture the mul instruction if enabled
+            captures.push(token);
+        }
+    }
+
+    let mut sum = 0;
+
+    for x in captures {
+        let nums = &x[4..x.len()-1];
+        let split: Vec<&str> = nums.split(",").collect();
+
+        sum += split[0].parse::<i32>().unwrap() * split[1].parse::<i32>().unwrap();
+    }
+
+    println!("Summe mit do dont: {sum}");
+}
 
 fn main_04_1() {}
 fn main_04_2() {}

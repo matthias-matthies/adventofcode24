@@ -324,9 +324,9 @@ fn main_03_1() {
 
     let re = Regex::new(r"mul\((\d+),(\d+)\)").unwrap();
 
-    let results: Vec<(i32)> = re.captures_iter(&*file_contents).map(|caps| {
+    let results: Vec<i32> = re.captures_iter(&*file_contents).map(|caps| {
         let (_, [left, right]) = caps.extract();
-        (left.parse::<i32>().unwrap() * right.parse::<i32>().unwrap())
+        left.parse::<i32>().unwrap() * right.parse::<i32>().unwrap()
     }).collect();
 
     let mut sum = 0;
@@ -381,7 +381,141 @@ fn main_03_2() {
     println!("Summe mit do dont: {sum}");
 }
 
-fn main_04_1() {}
+#[derive(Debug)]
+struct Word04_1 {
+    letter_1: char,
+    letter_2: char,
+    letter_3: char,
+    letter_4: char
+}
+
+impl Word04_1 {
+    fn is_xmas(&self) -> bool {
+        if
+            self.letter_1 == 'X' &&
+            self.letter_2 == 'M' &&
+            self.letter_3 == 'A' &&
+            self.letter_4 == 'S'
+        {
+            return true;
+        }
+
+        if
+            self.letter_1 == 'S' &&
+            self.letter_2 == 'A' &&
+            self.letter_3 == 'M' &&
+            self.letter_4 == 'X'
+        {
+            return true;
+        }
+        return false;
+    }
+}
+fn main_04_1() {
+    let file_contents = fs::read_to_string("assets/04.txt")
+        .expect("File 04");
+
+    let rows: Vec<&str> = file_contents.split("\n").collect();
+
+    let height = rows.len();
+    let width = rows[0].len();
+
+    let mut amount = 0;
+    let mut words: Vec<Word04_1> = vec![];
+
+    for height_idx in 0..height {
+        for width_idx in 0..width {
+            // If Left
+            if width_idx as isize - 3 >= 0 {
+                let word = Word04_1 {
+                    letter_1: rows[height_idx].as_bytes()[width_idx] as char,
+                    letter_2: rows[height_idx].as_bytes()[width_idx-1] as char,
+                    letter_3: rows[height_idx].as_bytes()[width_idx-2] as char,
+                    letter_4: rows[height_idx].as_bytes()[width_idx-3] as char,
+                };
+                words.push(word);
+            }
+            // If Left-Up
+            if width_idx as isize - 3 >= 0 && height_idx as isize - 3 >= 0 {
+                let word = Word04_1 {
+                    letter_1: rows[height_idx].as_bytes()[width_idx] as char,
+                    letter_2: rows[height_idx-1].as_bytes()[width_idx-1] as char,
+                    letter_3: rows[height_idx-2].as_bytes()[width_idx-2] as char,
+                    letter_4: rows[height_idx-3].as_bytes()[width_idx-3] as char,
+                };
+                words.push(word);
+            }
+            // If Up
+            if height_idx as isize - 3 >= 0 {
+                let word = Word04_1 {
+                    letter_1: rows[height_idx].as_bytes()[width_idx] as char,
+                    letter_2: rows[height_idx-1].as_bytes()[width_idx] as char,
+                    letter_3: rows[height_idx-2].as_bytes()[width_idx] as char,
+                    letter_4: rows[height_idx-3].as_bytes()[width_idx] as char,
+                };
+                words.push(word);
+            }
+            // If Up-Right
+            if height_idx as isize - 3 >= 0 && width_idx + 3 < width {
+                let word = Word04_1 {
+                    letter_1: rows[height_idx].as_bytes()[width_idx] as char,
+                    letter_2: rows[height_idx-1].as_bytes()[width_idx+1] as char,
+                    letter_3: rows[height_idx-2].as_bytes()[width_idx+2] as char,
+                    letter_4: rows[height_idx-3].as_bytes()[width_idx+3] as char,
+                };
+                words.push(word);
+            }
+            // If Right
+            if width_idx + 3 < width {
+                let word = Word04_1 {
+                    letter_1: rows[height_idx].as_bytes()[width_idx] as char,
+                    letter_2: rows[height_idx].as_bytes()[width_idx+1] as char,
+                    letter_3: rows[height_idx].as_bytes()[width_idx+2] as char,
+                    letter_4: rows[height_idx].as_bytes()[width_idx+3] as char,
+                };
+                words.push(word);
+            }
+            // If Right-Down
+            if width_idx + 3 < width && height_idx + 3 < height {
+                let word = Word04_1 {
+                    letter_1: rows[height_idx].as_bytes()[width_idx] as char,
+                    letter_2: rows[height_idx+1].as_bytes()[width_idx+1] as char,
+                    letter_3: rows[height_idx+2].as_bytes()[width_idx+2] as char,
+                    letter_4: rows[height_idx+3].as_bytes()[width_idx+3] as char,
+                };
+                words.push(word);
+            }
+            // If Down
+            if height_idx + 3 < height {
+                let word = Word04_1 {
+                    letter_1: rows[height_idx].as_bytes()[width_idx] as char,
+                    letter_2: rows[height_idx+1].as_bytes()[width_idx] as char,
+                    letter_3: rows[height_idx+2].as_bytes()[width_idx] as char,
+                    letter_4: rows[height_idx+3].as_bytes()[width_idx] as char,
+                };
+                words.push(word);
+            }
+            // If Down-Left
+            if height_idx + 3 < height && width_idx  as isize - 3 >= 0 {
+                let word = Word04_1 {
+                    letter_1: rows[height_idx].as_bytes()[width_idx] as char,
+                    letter_2: rows[height_idx+1].as_bytes()[width_idx-1] as char,
+                    letter_3: rows[height_idx+2].as_bytes()[width_idx-2] as char,
+                    letter_4: rows[height_idx+3].as_bytes()[width_idx-3] as char,
+                };
+                words.push(word);
+            }
+        }
+    }
+
+    for word in &words {
+        if word.is_xmas() {
+            amount += 1;
+        }
+    }
+
+    println!("Amount: {}", amount / 2);
+}
 fn main_04_2() {}
 
 fn main_05_1() {}

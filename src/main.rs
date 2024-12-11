@@ -381,14 +381,12 @@ fn main_03_2() {
     println!("Summe mit do dont: {sum}");
 }
 
-#[derive(Debug)]
 struct Word04_1 {
     letter_1: char,
     letter_2: char,
     letter_3: char,
     letter_4: char
 }
-
 impl Word04_1 {
     fn is_xmas(&self) -> bool {
         if
@@ -516,7 +514,65 @@ fn main_04_1() {
 
     println!("Amount: {}", amount / 2);
 }
-fn main_04_2() {}
+struct Word04_2 {
+    letter_1: char,
+    letter_2: char,
+    letter_3: char,
+}
+impl Word04_2 {
+    fn is_mas(&self) -> bool {
+        if
+            self.letter_1 == 'M' &&
+            self.letter_2 == 'A' &&
+            self.letter_3 == 'S'
+        {
+            return true;
+        }
+
+        if
+            self.letter_1 == 'S' &&
+            self.letter_2 == 'A' &&
+            self.letter_3 == 'M'
+        {
+            return true;
+        }
+        return false;
+    }
+}
+fn main_04_2() {
+    let file_contents = fs::read_to_string("assets/04.txt")
+        .expect("File 04");
+
+    let rows: Vec<&str> = file_contents.split("\n").collect();
+
+    let height = rows.len();
+    let width = rows[0].len();
+
+    let mut amount = 0;
+
+    for height_idx in 0..height-2 {
+        for width_idx in 0..width-2 {
+            // Create X-MAS Block in 3 by 3 Grid.
+            let word_1 = Word04_2 {
+                letter_1: rows[height_idx].as_bytes()[width_idx] as char,
+                letter_2: rows[height_idx+1].as_bytes()[width_idx+1] as char,
+                letter_3: rows[height_idx+2].as_bytes()[width_idx+2] as char,
+            };
+
+            let word_2 = Word04_2 {
+                letter_1: rows[height_idx+2].as_bytes()[width_idx] as char,
+                letter_2: rows[height_idx+1].as_bytes()[width_idx+1] as char,
+                letter_3: rows[height_idx].as_bytes()[width_idx+2] as char,
+            };
+
+            if word_1.is_mas() && word_2.is_mas() {
+                amount += 1;
+            }
+        }
+    }
+
+    println!("Amount of MAS: {}", amount);
+}
 
 fn main_05_1() {}
 fn main_05_2() {}
